@@ -6,7 +6,8 @@ export default function Auth({ onLogin }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
-  const [role, setRole] = useState('student')
+  const [roomNumber, setRoomNumber] = useState('')
+  const [consent, setConsent] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -26,11 +27,13 @@ export default function Auth({ onLogin }) {
       return
     }
 
-    // Create profile row linked to this user
+    // Everyone who signs up is a student. Staff roles are assigned by an admin in Supabase.
     const userId = data.user.id
     const { error: profileError } = await supabase
       .from('Profiles')
-      .insert([{ id: userId, full_name: fullName, role: role }])
+      .insert([
+        { id: userId, full_name: fullName, room_number: roomNumber, role: 'student' },
+      ])
 
     if (profileError) {
       setError(profileError.message)
@@ -60,54 +63,80 @@ export default function Auth({ onLogin }) {
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: '50px auto', padding: 20 }}>
-      <h2>{isSignUp ? 'Sign Up' : 'Log In'}</h2>
-      <form onSubmit={isSignUp ? handleSignUp : handleLogin}>
-        {isSignUp && (
-          <>
+    <div className="container-narrow" style={{ marginTop: 30 }}>
+      <div className="card">
+        <h2>{isSignUp ? 'Student Sign Up' : 'Log In'}</h2>
+        <form onSubmit={isSignUp ? handleSignUp : handleLogin}>
+          {isSignUp && (
+            <>
+              <div className="form-group">
+                <label>Full name</label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Room number</label>
+                <input
+                  type="text"
+                  value={roomNumber}
+                  onChange={(e) => setRoomNumber(e.target.value)}
+                  required
+                />
+              </div>
+            </>
+          )}
+
+          <div className="form-group">
+            <label>Email</label>
             <input
-              type="text"
-              placeholder="Full Name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              style={{ display: 'block', width: '100%', marginBottom: 10 }}
             />
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              style={{ display: 'block', width: '100%', marginBottom: 10 }}
-            >
-              <option value="student">Student/Resident</option>
-              <option value="technician">Maintenance Staff/Technician</option>
-              <option value="admin">Dorm Administrator</option>
-            </select>
-          </>
-        )}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: 10 }}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: 10 }}
-        />
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Please wait...' : isSignUp ? 'Sign Up' : 'Log In'}
+          </div>
+
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          {isSignUp && (
+            <label className="consent">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+                required
+              />
+              <span>
+                I agree that my name, room number, email, and any photos I upload will be
+                collected and used only to process dormitory maintenance requests, in
+                accordance with the Data Privacy Act of 2012 (RA 10173).
+              </span>
+            </label>
+          )}
+
+          {error && <p className="error">{error}</p>}
+
+          <button type="submit" className="btn-full" disabled={loading}>
+            {loading ? 'Please wait...' : isSignUp ? 'Sign Up' : 'Log In'}
+          </button>
+        </form>
+
+        <button className="link-btn" onClick={() => setIsSignUp(!isSignUp)}>
+          {isSignUp ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
         </button>
-      </form>
-      <button onClick={() => setIsSignUp(!isSignUp)} style={{ marginTop: 10 }}>
-        {isSignUp ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
-      </button>
+      </div>
     </div>
   )
 }

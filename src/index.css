@@ -254,6 +254,32 @@ th {
   font-size: 14px;
 }
 
+/* ---------- Auth ---------- */
+.consent {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.consent input {
+  margin-top: 3px;
+  width: auto;
+}
+
+.link-btn,
+.link-btn:hover {
+  background: none !important;
+  color: #2563eb !important;
+  padding: 0 !important;
+  margin-top: 12px;
+  font-size: 14px;
+  text-decoration: underline;
+  display: inline-block;
+}
+
 /* ---------- Phones ---------- */
 @media (max-width: 600px) {
   input, select, textarea {
